@@ -25,6 +25,7 @@ public class RedisBasedDistributedLock extends AbstractLock {
     }
 
     // 阻塞式获取锁的实现
+    @Override
     protected boolean lock(boolean useTimeout, long time, TimeUnit unit, boolean interrupt) throws InterruptedException {
         System.out.println("test1");
         if (interrupt) {
@@ -77,6 +78,7 @@ public class RedisBasedDistributedLock extends AbstractLock {
         return false;
     }
 
+    @Override
     public boolean tryLock() {
         long lockExpireTime = System.currentTimeMillis() + lockExpires + 1;// 锁超时时间
         String stringOfLockExpireTime = String.valueOf(lockExpireTime);
@@ -155,6 +157,7 @@ public class RedisBasedDistributedLock extends AbstractLock {
         jedis.del(lockKey);
     }
 
+    @Override
     public Condition newCondition() {
         // TODO Auto-generated method stub
         return null;
