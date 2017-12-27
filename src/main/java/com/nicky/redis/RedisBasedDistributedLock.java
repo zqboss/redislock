@@ -61,7 +61,7 @@ public class RedisBasedDistributedLock extends AbstractLock {
                 // 假设多个线程(非单jvm)同时走到这里
                 String oldValue = jedis.getSet(lockKey, stringOfLockExpireTime); //原子操作
                 // 但是走到这里时每个线程拿到的oldValue肯定不可能一样(因为getset是原子性的)
-                // 加入拿到的oldValue依然是expired的，那么就说明拿到锁了
+                // 假如拿到的oldValue依然是expired的，那么就说明拿到锁了
                 System.out.println("test8");
                 if (oldValue != null && isTimeExpired(oldValue)) {
                     System.out.println("test9");
