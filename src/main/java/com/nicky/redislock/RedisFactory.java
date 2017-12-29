@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.nicky.redis.RedisUtil;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -29,18 +30,24 @@ public class RedisFactory {
 	
 	public static RedisClient getDefaultClient(){
 		JedisPool pool = null;
-		String ip = "192.168.0.88";
+		String ip = "192.168.0.205";
 		int port = 6379;
 		JedisPoolConfig config = new JedisPoolConfig();
-		// 控制一个pool可分配多少个jedis实例，通过pool.getResource()来获取；
-		// 如果赋值为-1，则表示不限制；如果pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
-		config.setMaxTotal(10000);
-		// 控制一个pool最多有多少个状态为idle(空闲的)的jedis实例。
-		config.setMaxIdle(2000);
-		// 表示当borrow(引入)一个jedis实例时，最大的等待时间，如果超过等待时间，则直接抛出JedisConnectionException；
-		config.setMaxWaitMillis(1000 * 100);
+		config.setMaxTotal(200);
+		config.setMaxIdle(50);
+		config.setMinIdle(8);//设置最小空闲数
+		config.setMaxWaitMillis(10000);
 		config.setTestOnBorrow(true);
-		pool = new JedisPool(config, ip, port, 100000, "zengqiao");
+		config.setTestOnReturn(true);
+//Idle时进行连接扫描
+		config.setTestWhileIdle(true);
+//表示idle object evitor两次扫描之间要sleep的毫秒数
+		config.setTimeBetweenEvictionRunsMillis(30000);
+//表示idle object evitor每次扫描的最多的对象数
+		config.setNumTestsPerEvictionRun(10);
+//表示一个对象至少停留在idle状态的最短时间，然后才能被idle object evitor扫描并驱逐；这一项只有在timeBetweenEvictionRunsMillis大于0时才有意义
+		config.setMinEvictableIdleTimeMillis(60000);
+		pool = new JedisPool(config, ip, port, 100000, RedisUtil.PASSWORD);
 		RedisClient client = new RedisClient(pool);
 		return client;
 	}

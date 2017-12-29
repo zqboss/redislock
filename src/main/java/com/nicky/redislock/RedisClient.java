@@ -485,7 +485,7 @@ public class RedisClient {
         Jedis client = jedisPool.getResource();
         try {
             if (ts == null || ts.size() ==0) {
-                return 0l;
+                return 0L;
             }
             String[] values = new String[ts.size()];
             for (int i = 0; i < ts.size(); i++) {

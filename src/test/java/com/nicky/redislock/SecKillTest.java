@@ -23,18 +23,17 @@ public class SecKillTest {
 	private static Long commidityId1 = 10000001L;
 	private static Long commidityId2 = 10000002L;
 	private RedisClient client;
-	public static String HOST = "192.168.0.88";
 	private JedisPool jedisPool;
 	@Before
 	public synchronized void  beforeTest() throws IOException{
 		
 		
-		jedisPool = new JedisPool("192.168.0.88");
+		jedisPool = new JedisPool(RedisUtil.IP);
 		
 	}
 
 	@Test
-    public void dd() {
+    public void testRedis() {
         Deque<Integer> deque = new ArrayDeque<>(1<<1);
         deque.addFirst(1);
         deque.addLast(2);
@@ -48,12 +47,6 @@ public class SecKillTest {
 
 //        String [] a = {"a", "b"};
 //        System.out.println(String.join(":", "a", "b"));
-    }
-
-    @Test public void teee() {
-        String a = "3个月";
-        System.out.println(a.replace("个月",""));
-
     }
 
 	@Test
