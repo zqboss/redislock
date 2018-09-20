@@ -19,9 +19,8 @@ public class TestController {
         return "welcome to seckill";
     }
     @RequestMapping(value = "/test")
-    public void testSecKill() {
+    public String testSecKill() {
         RedisUtil redisUtil = RedisUtil.getInstance();
-        jedis = redisUtil.getJedis();
 
         int threadCount = 1000;
         final CountDownLatch endCount = new CountDownLatch(threadCount);
@@ -32,14 +31,14 @@ public class TestController {
         String commidityNumber = "0";
         //先判断时间到点没，没到点直接返回
         //判断时间是否到了秒杀时间
-        if(!jedis.exists(commidityName)){
+        if(!redisUtil.exists(commidityName)){
             //不存在 就去数据去里面去查询再set进redis，并设置个过期时间
-            jedis.set(commidityName, commidityNumber);
-            jedis.expire(commidityName, 200000);
+            redisUtil.set(commidityName, commidityNumber);
+            redisUtil.expire(commidityName, 200000);
         }else {
-            jedis.del(commidityName);
-            jedis.set(commidityName, commidityNumber);
-            jedis.expire(commidityName, 200000);
+            redisUtil.del(commidityName);
+            redisUtil.set(commidityName, commidityNumber);
+            redisUtil.expire(commidityName, 200000);
         }
 
         Thread[] threads = new Thread[threadCount];
@@ -52,7 +51,7 @@ public class TestController {
                         beginCount.await();
                         //直接秒杀库存
                         String currentThreadName = Thread.currentThread().getName();
-                        secKill(currentThreadName, commidityName);
+                        secKill(currentThreadName, commidityName,redisUtil);
                         endCount.countDown();
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
@@ -79,13 +78,14 @@ public class TestController {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return "success";
     }
 
     //秒杀主方法
-    public void secKill(String theadName, String commidityName) {
+    public void secKill(String theadName, String commidityName,RedisUtil redisUtil) {
         //某商品秒杀只能一件
         try {
-            Long remainNumber = jedis.incr(commidityName);
+            Long remainNumber = redisUtil.incr(commidityName);
             Integer intNumber = remainNumber.intValue()+1;
             if (intNumber >0) {
                 System.out.println("线程名:" + theadName + "，秒杀了第" + intNumber + "号商品");
